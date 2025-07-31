@@ -1,0 +1,56 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-core:
+    name: Test aurora-core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-core
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Check formatting
+        run: poetry run black --check .
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Run tests
+        run: poetry run pytest
+
+  test-crawler:
+    name: Test aurora-crawler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-crawler
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Check formatting
+        run: poetry run black --check .
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Run tests
+        run: poetry run pytest
