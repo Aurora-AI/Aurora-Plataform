@@ -1,0 +1,29 @@
+name: CI Alerts
+
+on:
+  workflow_run:
+    workflows: [CI Aurora-Core, CI Aurora-Crawler]
+    types:
+      - completed
+
+jobs:
+  send-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Slack Alert on Failure
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          slack-message: 'CI/CD falhou em ${{ github.event.workflow_run.name }}. Verifique o build e os testes.'
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send Email Alert on Failure
+        if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.example.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USER }}
+          password: ${{ secrets.EMAIL_PASS }}
+          subject: 'CI/CD Falhou'
+          to: 'dev-team@aurora.ai'
+          body: 'O workflow ${{ github.event.workflow_run.name }} falhou. Verifique logs.'
