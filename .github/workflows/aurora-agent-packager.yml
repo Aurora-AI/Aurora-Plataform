@@ -1,0 +1,139 @@
+name: Aurora Agent Packager
+
+on:
+  issues:
+    types: [opened, labeled]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  dependency_check:
+    if: contains(github.event.issue.labels.*.name, 'new-dependency') || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Extract package name from issue
+        if: github.event_name == 'issues'
+        id: extract_package
+        run: |
+          PACKAGE_NAME=$(echo "${{ github.event.issue.body }}" | grep -oP '(?<=package:\s)[\w\-_]+' | head -1)
+          echo "package_name=${PACKAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "Extracted package name: ${PACKAGE_NAME}"
+          
+      - name: Check approved packages
+        if: github.event_name == 'issues' && steps.extract_package.outputs.package_name != ''
+        run: |
+          PACKAGE_NAME="${{ steps.extract_package.outputs.package_name }}"
+          echo "Checking if package '${PACKAGE_NAME}' is in approved list..."
+          
+          if python3 -c "
+          import json
+          with open('approved_packages.json', 'r') as f:
+              data = json.load(f)
+          approved = data.get('approved_packages', [])
+          package_name = '${PACKAGE_NAME}'
+          if package_name.lower() in [p.lower() for p in approved]:
+              print(f'✅ Package {package_name} is approved')
+              exit(0)
+          else:
+              print(f'❌ Package {package_name} requires security review')
+              exit(1)
+          "; then
+            echo "APPROVED=true" >> $GITHUB_ENV
+          else
+            echo "APPROVED=false" >> $GITHUB_ENV
+          fi
+          
+      - name: Add security review label
+        if: github.event_name == 'issues' && env.APPROVED == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['security-review-required']
+            });
+            
+      - name: Comment on issue
+        if: github.event_name == 'issues' && steps.extract_package.outputs.package_name != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const packageName = '${{ steps.extract_package.outputs.package_name }}';
+            const isApproved = '${{ env.APPROVED }}' === 'true';
+            
+            const message = isApproved 
+              ? `✅ **Pacote Aprovado**: \`${packageName}\` está na lista de pacotes aprovados e pode ser adicionado.`
+              : `⚠️ **Revisão de Segurança Necessária**: \`${packageName}\` não está na lista de pacotes aprovados.
+              
+            Este pacote requer revisão de segurança antes da inclusão. A label \`security-review-required\` foi adicionada.
+            
+            @aurora-dev/core-team favor revisar este pacote.`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
+
+  pr_dependency_scan:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Check for new dependencies in PR
+        run: |
+          echo "Scanning PR for new dependencies..."
+          
+          # Check if pyproject.toml files were modified
+          git diff origin/main...HEAD --name-only | grep -E "(pyproject\.toml|requirements.*\.txt)" || {
+            echo "No dependency files modified in this PR"
+            exit 0
+          }
+          
+          echo "Dependency files modified. Manual review required."
+          echo "NEW_DEPS_FOUND=true" >> $GITHUB_ENV
+          
+      - name: Comment on PR about dependencies
+        if: env.NEW_DEPS_FOUND == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `🔍 **Verificação de Dependências**
+            
+            Este PR modifica arquivos de dependências. Por favor, verifique:
+            
+            1. ✅ Todas as novas dependências estão em \`approved_packages.json\`
+            2. ✅ Dependências seguem princípio de menor privilégio
+            3. ✅ Não há conflitos de versão
+            4. ✅ Licenças são compatíveis (MIT, Apache 2.0, BSD)
+            
+            @aurora-dev/core-team favor revisar as alterações de dependências.
+            
+            **Nota**: Nenhum PR é mesclado automaticamente. Revisão humana obrigatória.`;
+            
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
