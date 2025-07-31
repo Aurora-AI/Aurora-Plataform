@@ -19,9 +19,8 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt || true
-          pip install poetry || true
-          poetry install || true
+          pip install poetry
+          poetry install --no-interaction
       - name: Run tests
         run: |
           pytest || true
