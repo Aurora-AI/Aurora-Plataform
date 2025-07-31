@@ -1,0 +1,104 @@
+# Aurora-Plataform Monorepo - Unified Docker Compose Configuration
+# Orchestrates all services and shared resources for the Aurora ecosystem
+
+services:
+  # Shared Infrastructure Services
+  redis:
+    image: redis:latest
+    container_name: aurora-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+  chromadb:
+    image: chromadb/chroma:0.4.15 # Fixed version for stability and compatibility
+    container_name: aurora-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    # CRITICAL FIX: Force compatible NumPy installation before starting
+    command: sh -c "pip install --force-reinstall 'numpy<2.0' && uvicorn chromadb.app:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+  # Application Services
+  aurora-core:
+    build:
+      context: ./aurora-core
+      dockerfile: Dockerfile
+    container_name: aurora-core
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./aurora-core/.env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - aurora-network
+    volumes:
+      - ./aurora-core:/app
+      - /app/.venv  # Preserve virtual environment
+
+  aurora-crawler:
+    build:
+      context: ./aurora-crawler
+      dockerfile: Dockerfile
+    container_name: aurora-crawler
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./aurora-crawler/.env
+    environment:
+      - CHROMA_MODE=CLIENT_SERVER
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - aurora-network
+    volumes:
+      - ./aurora-crawler:/app
+      - /app/.venv  # Preserve virtual environment
+
+# Network Configuration
+networks:
+  aurora-network:
+    driver: bridge
+    name: aurora-network
+
+# Volume Configuration
+volumes:
+  redis_data:
+    name: aurora-redis-data
+  chroma_data:
+    name: aurora-chroma-data
