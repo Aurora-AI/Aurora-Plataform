@@ -1,0 +1,21 @@
+# .dockerignore para Aurora-Crawler
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.venv
+build/
+dist/
+.eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+*.log
+*.sqlite3
+outputs/
+chroma_data/
+chroma_db/
+# NÃO ignore README.md
+!README.md

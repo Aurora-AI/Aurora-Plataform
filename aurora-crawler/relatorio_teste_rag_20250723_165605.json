@@ -1,0 +1,429 @@
+{
+  "test_summary": {
+    "execution_date": "2025-07-23T16:56:05.057958",
+    "total_documents_in_kb": 1100,
+    "total_tests_executed": 40,
+    "successful_tests": 40,
+    "success_rate_percent": 100.0,
+    "average_response_time_ms": 259.38,
+    "average_relevance_score": 0.618
+  },
+  "performance_benchmark": {
+    "test_name": "Performance Benchmark",
+    "total_queries": 20,
+    "successful_queries": 20,
+    "success_rate_percent": 100.0,
+    "avg_response_time_ms": 293.9,
+    "min_response_time_ms": 271.16,
+    "max_response_time_ms": 357.49,
+    "queries_per_second": 3.4
+  },
+  "detailed_test_results": [
+    {
+      "test_name": "Consulta sobre residência médica",
+      "query": "residência médica",
+      "response_time_ms": 346.57,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.8,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:49.128812"
+    },
+    {
+      "test_name": "Consulta sobre especialização",
+      "query": "especialização médica",
+      "response_time_ms": 214.7,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.6,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:49.343819"
+    },
+    {
+      "test_name": "Consulta sobre a própria AMB",
+      "query": "AMB",
+      "response_time_ms": 241.86,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 1.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:49.585934"
+    },
+    {
+      "test_name": "Consulta sobre medicina geral",
+      "query": "medicina geral",
+      "response_time_ms": 219.23,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.9,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:49.805514"
+    },
+    {
+      "test_name": "Consulta sobre eventos médicos",
+      "query": "congresso médico",
+      "response_time_ms": 229.58,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.8,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:50.035532"
+    },
+    {
+      "test_name": "Consulta sobre formação profissional",
+      "query": "formação médica",
+      "response_time_ms": 222.34,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.7,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:50.258340"
+    },
+    {
+      "test_name": "Consulta sobre saúde pública",
+      "query": "saúde pública",
+      "response_time_ms": 230.86,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.8,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:50.489573"
+    },
+    {
+      "test_name": "Consulta sobre pandemia COVID-19",
+      "query": "covid",
+      "response_time_ms": 229.75,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 1.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:50.719602"
+    },
+    {
+      "test_name": "Consulta sobre telemedicina",
+      "query": "telemedicina",
+      "response_time_ms": 219.28,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 1.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:50.939401"
+    },
+    {
+      "test_name": "Consulta sobre ética profissional",
+      "query": "ética médica",
+      "response_time_ms": 224.47,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.5,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:51.164168"
+    },
+    {
+      "test_name": "Certificação de especialistas",
+      "query": "Como funciona o processo de certificação de especialistas médicos no Brasil",
+      "response_time_ms": 245.18,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.606,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:51.410317"
+    },
+    {
+      "test_name": "Desafios da residência",
+      "query": "Quais são os principais desafios da residência médica no país",
+      "response_time_ms": 227.04,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.8,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:51.637851"
+    },
+    {
+      "test_name": "Posicionamento AMB telemedicina",
+      "query": "AMB posicionamento sobre telemedicina e consultas online",
+      "response_time_ms": 209.04,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.667,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:51.847210"
+    },
+    {
+      "test_name": "Regulamentação COVID-19",
+      "query": "Regulamentação e diretrizes para médicos durante pandemia COVID-19",
+      "response_time_ms": 221.29,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.667,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:52.068806"
+    },
+    {
+      "test_name": "Educação médica continuada",
+      "query": "Formação médica continuada e atualização profissional",
+      "response_time_ms": 238.39,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.611,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:52.307581"
+    },
+    {
+      "test_name": "Defesa profissional médica",
+      "query": "Defesa profissional e direitos dos médicos no Brasil",
+      "response_time_ms": 237.05,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.792,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:52.545051"
+    },
+    {
+      "test_name": "AMB e sociedades",
+      "query": "Relacionamento entre AMB e sociedades de especialidades médicas",
+      "response_time_ms": 229.61,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.708,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:52.774990"
+    },
+    {
+      "test_name": "Combate exercício ilegal",
+      "query": "Combate ao exercício ilegal da medicina e fiscalização",
+      "response_time_ms": 211.3,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.583,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:52.986567"
+    },
+    {
+      "test_name": "Políticas de saúde AMB",
+      "query": "Políticas de saúde e participação da AMB no governo federal",
+      "response_time_ms": 222.72,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.767,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:53.209686"
+    },
+    {
+      "test_name": "Eventos científicos AMB",
+      "query": "Congressos médicos e eventos científicos organizados pela AMB",
+      "response_time_ms": 232.42,
+      "documents_found": 3,
+      "has_metadata": true,
+      "relevance_score": 0.583,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:53.442529"
+    },
+    {
+      "test_name": "Notícias recentes 2025",
+      "query": "notícias AMB 2025",
+      "response_time_ms": 225.67,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.75,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:53.668788"
+    },
+    {
+      "test_name": "Eventos 2024",
+      "query": "eventos médicos 2024",
+      "response_time_ms": 226.89,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.583,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:53.895998"
+    },
+    {
+      "test_name": "Período pandemia",
+      "query": "pandemia covid 2020 2021",
+      "response_time_ms": 233.5,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.75,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:54.129884"
+    },
+    {
+      "test_name": "CMG 2025",
+      "query": "congresso medicina geral 2025",
+      "response_time_ms": 289.52,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.875,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:54.420329"
+    },
+    {
+      "test_name": "Mudanças recentes residência",
+      "query": "mudanças residência médica últimos anos",
+      "response_time_ms": 303.56,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.45,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:54.724390"
+    },
+    {
+      "test_name": "Posicionamentos recentes",
+      "query": "posicionamentos AMB 2023 2024",
+      "response_time_ms": 290.41,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.438,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:55.015243"
+    },
+    {
+      "test_name": "Evolução telemedicina",
+      "query": "telemedicina antes depois pandemia",
+      "response_time_ms": 308.44,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.562,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:55.324115"
+    },
+    {
+      "test_name": "Evolução formação médica",
+      "query": "formação médica mudanças temporais",
+      "response_time_ms": 304.28,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.438,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:55.628722"
+    },
+    {
+      "test_name": "Políticas atuais",
+      "query": "políticas saúde governo atual",
+      "response_time_ms": 301.73,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.312,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:55.930953"
+    },
+    {
+      "test_name": "Diretrizes recentes",
+      "query": "novas diretrizes médicas recentes",
+      "response_time_ms": 267.31,
+      "documents_found": 4,
+      "has_metadata": true,
+      "relevance_score": 0.312,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:56.198747"
+    },
+    {
+      "test_name": "Consulta sem resultados esperados",
+      "query": "xyz medicina quântica espacial",
+      "response_time_ms": 283.0,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.2,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:56.482636"
+    },
+    {
+      "test_name": "Consulta vazia",
+      "query": "",
+      "response_time_ms": 287.73,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:56.770772"
+    },
+    {
+      "test_name": "Consulta muito curta",
+      "query": "a",
+      "response_time_ms": 289.69,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 1.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:57.060796"
+    },
+    {
+      "test_name": "Consulta extremamente longa",
+      "query": "Como a Associação Médica Brasileira estabelece políticas para a formação continuada de médicos especialistas no contexto das mudanças tecnológicas e demandas epidemiológicas contemporâneas incluindo telemedicina inteligência artificial diagnóstico digital",
+      "response_time_ms": 302.4,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.434,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:57.363897"
+    },
+    {
+      "test_name": "Consulta repetitiva",
+      "query": "AMB AMB AMB AMB AMB",
+      "response_time_ms": 291.31,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 1.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:57.655558"
+    },
+    {
+      "test_name": "Consulta com muitas palavras-chave",
+      "query": "médico doutor medicina saúde hospital clínica paciente",
+      "response_time_ms": 303.48,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.6,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:57.959653"
+    },
+    {
+      "test_name": "Consulta numérica",
+      "query": "123456789",
+      "response_time_ms": 312.17,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:58.272269"
+    },
+    {
+      "test_name": "Consulta com símbolos",
+      "query": "!@#$%^&*()",
+      "response_time_ms": 313.97,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.0,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:58.586648"
+    },
+    {
+      "test_name": "Termos técnicos específicos",
+      "query": "COVID-19 SARS-CoV-2 pandemia coronavirus",
+      "response_time_ms": 286.74,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.65,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:58.873896"
+    },
+    {
+      "test_name": "Consulta por recência",
+      "query": "notícia mais recente AMB",
+      "response_time_ms": 300.91,
+      "documents_found": 5,
+      "has_metadata": true,
+      "relevance_score": 0.5,
+      "status": "SUCCESS",
+      "timestamp": "2025-07-23T16:55:59.175158"
+    }
+  ],
+  "test_categories": {
+    "basic_queries": 19,
+    "complex_queries": 4,
+    "temporal_queries": 6,
+    "edge_cases": 4
+  }
+}

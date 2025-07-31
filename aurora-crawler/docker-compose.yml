@@ -1,0 +1,17 @@
+# docker-compose.yml
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aurora_crawler_poc_app
+    ports:
+      - "8001:8000"
+    volumes:
+      # Monta todo o diretório do projeto, não apenas 'src'
+      # Isso permite que o Dev Container veja todos os arquivos (testes, etc.)
+      - .:/app
+    env_file:
+      - .env
+    restart: unless-stopped
