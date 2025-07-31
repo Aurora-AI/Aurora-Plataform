@@ -1,0 +1,217 @@
+# docker-compose.yaml - Aurora-Plataform Unified Orchestration
+# Gerencia todos os serviços do monorepo Aurora-Plataform
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # INFRASTRUCTURE SERVICES
+  # ============================================================================
+  
+  postgresql:
+    image: postgres:15-alpine
+    container_name: aurora_postgresql
+    environment:
+      POSTGRES_USER: aurora_user
+      POSTGRES_PASSWORD: aurora_password
+      POSTGRES_DB: aurora_core
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurora_user -d aurora_core"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - aurora_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: aurora_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - aurora_network
+    command: redis-server --appendonly yes
+
+  chromadb:
+    image: chromadb/chroma:0.4.15
+    container_name: aurora_chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      CHROMA_HOST: 0.0.0.0
+      CHROMA_PORT: 8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - aurora_network
+    # Fix for NumPy compatibility issue
+    command: sh -c "pip install --force-reinstall 'numpy<2.0' && uvicorn chromadb.app:app --host 0.0.0.0 --port 8000"
+
+  # ============================================================================
+  # APPLICATION SERVICES
+  # ============================================================================
+
+  aurora-core:
+    build:
+      context: ./aurora-core
+      dockerfile: Dockerfile
+    container_name: aurora_core
+    ports:
+      - "8080:8080"
+    environment:
+      # Database Configuration
+      DATABASE_URL: postgresql://aurora_user:aurora_password@postgresql:5432/aurora_core
+      POSTGRES_USER: aurora_user
+      POSTGRES_PASSWORD: aurora_password
+      POSTGRES_DB: aurora_core
+      
+      # Redis Configuration
+      REDIS_URL: redis://redis:6379
+      
+      # ChromaDB Configuration
+      CHROMA_URL: http://chromadb:8000
+      
+      # Application Configuration
+      ENVIRONMENT: production
+      DEBUG: "false"
+      LOG_LEVEL: INFO
+      
+      # Security (use proper secrets in production)
+      SECRET_KEY: "aurora-platform-secret-key-change-in-production"
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      
+    volumes:
+      - aurora_core_logs:/app/logs
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - aurora_network
+
+  aurora-crawler:
+    build:
+      context: ./aurora-crawler
+      dockerfile: Dockerfile
+    container_name: aurora_crawler
+    ports:
+      - "8001:8000"
+    environment:
+      # Chrome Driver Configuration
+      CHROME_DRIVER_PATH: /usr/local/bin/chromedriver
+      HEADLESS_MODE: "true"
+      
+      # Output Configuration
+      OUTPUT_DIR: /app/outputs
+      LOG_LEVEL: INFO
+      
+      # Rate Limiting
+      REQUEST_DELAY: 1
+      MAX_RETRIES: 3
+      
+      # Aurora-Core Integration
+      AURORA_CORE_URL: http://aurora-core:8080
+      
+    volumes:
+      - aurora_crawler_outputs:/app/outputs
+      - aurora_crawler_logs:/app/logs
+    depends_on:
+      aurora-core:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - aurora_network
+
+  # ============================================================================
+  # MONITORING & OBSERVABILITY (Optional - for future implementation)
+  # ============================================================================
+
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: aurora_nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+  #     - ./nginx/ssl:/etc/nginx/ssl:ro
+  #   depends_on:
+  #     - aurora-core
+  #     - aurora-crawler
+  #   restart: unless-stopped
+  #   networks:
+  #     - aurora_network
+
+# ============================================================================
+# VOLUMES
+# ============================================================================
+
+volumes:
+  postgresql_data:
+    driver: local
+    name: aurora_postgresql_data
+  redis_data:
+    driver: local
+    name: aurora_redis_data
+  chromadb_data:
+    driver: local
+    name: aurora_chromadb_data
+  aurora_core_logs:
+    driver: local
+    name: aurora_core_logs
+  aurora_crawler_outputs:
+    driver: local
+    name: aurora_crawler_outputs
+  aurora_crawler_logs:
+    driver: local
+    name: aurora_crawler_logs
+
+# ============================================================================
+# NETWORKS
+# ============================================================================
+
+networks:
+  aurora_network:
+    driver: bridge
+    name: aurora_network
