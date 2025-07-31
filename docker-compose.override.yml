@@ -1,0 +1,29 @@
+# Aurora-Plataform Development Override
+# Use with: docker compose -f docker-compose.yaml -f docker-compose.override.yml up
+
+services:
+  aurora-core:
+    # Override build target for development
+    build:
+      context: ./aurora-core
+      dockerfile: Dockerfile
+      target: builder  # Use builder stage with development tools
+    volumes:
+      - ./aurora-core:/app
+      # Override to not preserve venv in dev mode for hot reloading
+    command: ["uvicorn", "src.aurora_platform.main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+
+  aurora-crawler:
+    # Enable hot reloading for crawler as well
+    volumes:
+      - ./aurora-crawler:/app
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+    # Add command override if needed for development mode
+    
+  # Development tools and additional services can be added here
+  # Example: Add a development database browser or monitoring tool

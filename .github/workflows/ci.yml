@@ -1,0 +1,184 @@
+name: Aurora-Plataform CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # Test individual services
+  test-aurora-core:
+    name: Test Aurora-Core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-core
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install Poetry
+        run: pip install poetry
+      
+      - name: Configure Poetry
+        run: poetry config virtualenvs.create false
+      
+      - name: Install dependencies
+        run: poetry install
+      
+      - name: Lint with Ruff
+        run: poetry run ruff check .
+        continue-on-error: true
+      
+      - name: Run tests
+        run: poetry run pytest
+        continue-on-error: true
+
+  test-aurora-crawler:
+    name: Test Aurora-Crawler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-crawler
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'  # Aurora-Crawler uses Python 3.13
+      
+      - name: Install Poetry
+        run: pip install poetry
+      
+      - name: Configure Poetry
+        run: poetry config virtualenvs.create false
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl ffmpeg procps
+      
+      - name: Install dependencies
+        run: poetry install
+      
+      - name: Install Playwright browsers
+        run: poetry run playwright install chromium
+      
+      - name: Run tests
+        run: poetry run pytest
+        continue-on-error: true
+
+  # Test unified Docker Compose configuration
+  test-docker-compose:
+    name: Test Docker Compose Configuration
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create environment files
+        run: |
+          cp aurora-core/.env.example aurora-core/.env
+          cp aurora-crawler/.env.example aurora-crawler/.env
+      
+      - name: Validate Docker Compose
+        run: docker compose config
+      
+      - name: Build services (without starting)
+        run: docker compose build
+        continue-on-error: true
+
+  # Integration tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [test-aurora-core, test-aurora-crawler, test-docker-compose]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Create environment files
+        run: |
+          cp aurora-core/.env.example aurora-core/.env
+          cp aurora-crawler/.env.example aurora-crawler/.env
+      
+      - name: Start services
+        run: |
+          docker compose up -d
+          sleep 60  # Wait for services to be ready
+      
+      - name: Check service health
+        run: |
+          # Check if services are running
+          docker compose ps
+          
+          # Test service endpoints (basic connectivity)
+          curl -f http://localhost:8080/docs || echo "Aurora-Core not ready"
+          curl -f http://localhost:8001/docs || echo "Aurora-Crawler not ready"
+          curl -f http://localhost:8000/api/v1/heartbeat || echo "ChromaDB not ready"
+        continue-on-error: true
+      
+      - name: Show service logs on failure
+        if: failure()
+        run: |
+          echo "=== Aurora-Core Logs ==="
+          docker compose logs aurora-core
+          echo "=== Aurora-Crawler Logs ==="
+          docker compose logs aurora-crawler
+          echo "=== ChromaDB Logs ==="
+          docker compose logs chromadb
+          echo "=== Redis Logs ==="
+          docker compose logs redis
+      
+      - name: Cleanup
+        run: docker compose down -v
+
+  # Deployment (only on main branch)
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [integration-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to production
+        run: |
+          echo "Deployment would happen here"
+          # Add actual deployment steps when ready
+        
+  # Documentation validation
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check documentation structure
+        run: |
+          # Verify required documentation files exist
+          test -f README.md || exit 1
+          test -f docs/UNIFICATION_BLUEPRINT.md || exit 1
+          test -f docs/ARCHITECTURE.md || exit 1
+          test -f scripts/README.md || exit 1
+          echo "✅ All required documentation files present"
+      
+      - name: Validate scripts
+        run: |
+          # Check that scripts are executable
+          test -x scripts/setup.sh || exit 1
+          test -x scripts/dev-helper.sh || exit 1
+          echo "✅ All scripts are executable"

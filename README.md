@@ -93,6 +93,20 @@ Aurora-Plataform/
 
 ## 🛠️ Development
 
+### Quick Development Setup
+Use the provided setup script for fast initialization:
+
+```bash
+# Full setup with environment validation
+./scripts/setup.sh
+
+# Development utilities
+./scripts/dev-helper.sh health              # Check service status
+./scripts/dev-helper.sh logs aurora-core    # View service logs
+./scripts/dev-helper.sh shell aurora-core   # Open service shell
+./scripts/dev-helper.sh test aurora-core    # Run service tests
+```
+
 ### Individual Service Development
 Each service can be developed independently:
 
@@ -112,6 +126,12 @@ poetry run uvicorn src.main:app --reload
 Use Docker Compose for full stack development:
 
 ```bash
+# Development mode with hot reloading
+docker compose -f docker-compose.yaml -f docker-compose.override.yml up --build
+
+# Production mode
+docker compose up --build
+
 # Rebuild specific service
 docker compose up --build aurora-core
 
@@ -145,6 +165,15 @@ Each service has its own `.env` file with service-specific configurations:
 Services automatically connect to shared infrastructure via the unified Docker network:
 - Redis: `redis://redis:6379`
 - ChromaDB: `http://chromadb:8000`
+
+### Configuration Consolidation
+This monorepo has unified previously separate docker-compose and CI/CD configurations:
+- ✅ Removed duplicate docker-compose.yml files from individual services
+- ✅ Consolidated GitHub Actions workflows into a single monorepo CI/CD pipeline
+- ✅ Unified .gitignore at the root level
+- ✅ Preserved all functionality while eliminating duplication
+
+Legacy configuration files are preserved in `docs/legacy/` for reference.
 
 ## 📊 Monitoring and Health Checks
 
