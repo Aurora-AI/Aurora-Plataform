@@ -23,7 +23,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --extras dev
       - name: Check formatting
         run: poetry run black --check .
       - name: Lint
@@ -47,7 +47,7 @@ jobs:
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with dev
       - name: Check formatting
         run: poetry run black --check .
       - name: Lint

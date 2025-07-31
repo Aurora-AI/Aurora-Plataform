@@ -75,6 +75,8 @@ pytest = "*"
 pytest-asyncio = "*"
 httpx = "*"
 pre-commit = "^4.2.0"
+black = "^24.4.2"
+ruff = "^0.4.3"
 
 [tool.poetry.group.server]
 optional = true
