@@ -70,8 +70,20 @@ The following branch protection rules must be configured manually in the GitHub 
 1. Go to Repository Settings → Branches
 2. Add branch protection rule for `main`
 3. Enable "Require status checks to pass before merging"
-4. Select the required status checks: `test-core` and `test-crawler`
-5. Save the protection rule
+4. Enable "Require branches to be up to date before merging"
+5. Search for and select the required status checks: `test-core` and `test-crawler`
+6. Save the protection rule
+
+**Alternative Configuration via GitHub CLI** (if available):
+```bash
+# Enable branch protection with required status checks
+gh api repos/:owner/:repo/branches/main/protection \
+  --method PUT \
+  --field required_status_checks='{"strict":true,"contexts":["test-core","test-crawler"]}' \
+  --field enforce_admins=true \
+  --field required_pull_request_reviews='{"required_approving_review_count":1}' \
+  --field restrictions=null
+```
 
 ### Impact
 
@@ -79,6 +91,7 @@ With these protections in place:
 - Pull requests cannot be merged unless both test jobs pass
 - This ensures code quality and prevents broken code from entering the main branch
 - Developers must resolve any test failures before merging
+- The pipeline will be more resilient due to caching, reducing failures from network issues
 
 ## Migration from continuous_integration.yml
 
