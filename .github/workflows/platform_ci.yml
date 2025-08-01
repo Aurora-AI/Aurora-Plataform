@@ -1,0 +1,102 @@
+name: Platform CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-core:
+    name: Test aurora-core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-core
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Cache Poetry dependencies for faster builds and network resilience
+      # Uses poetry.lock hash as cache key to ensure cache invalidation when dependencies change
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: poetry-${{ runner.os }}-py3.11-${{ hashFiles('aurora-core/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-py3.11-
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check formatting
+        run: poetry run black --check .
+
+      - name: Lint
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest
+
+  test-crawler:
+    name: Test aurora-crawler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-crawler
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Cache Poetry dependencies for faster builds and network resilience
+      # Uses poetry.lock hash as cache key to ensure cache invalidation when dependencies change
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: poetry-${{ runner.os }}-py3.11-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-py3.11-
+
+      # Cache Hugging Face models for faster builds and network resilience
+      # Uses pyproject.toml hash as cache key since model dependencies are defined there
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: huggingface-${{ runner.os }}-${{ hashFiles('aurora-crawler/pyproject.toml') }}
+          restore-keys: |
+            huggingface-${{ runner.os }}-
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check formatting
+        run: poetry run black --check .
+
+      - name: Lint
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest
