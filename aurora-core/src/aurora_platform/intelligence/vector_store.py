@@ -23,7 +23,9 @@ class VectorStore:
         try:
             self.collection = self.client.get_collection(name=name)
             print(f"Collection '{name}' retrieved.")
-        except Exception:  # chromadb.errors.CollectionNotFoundException - more specific error handling is better
+        except (
+            Exception
+        ):  # chromadb.errors.CollectionNotFoundException - more specific error handling is better
             self.collection = self.client.create_collection(name=name)
             print(f"Collection '{name}' created.")
         return self.collection

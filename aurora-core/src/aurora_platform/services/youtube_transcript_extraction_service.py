@@ -69,7 +69,6 @@ class YoutubeTranscriptExtractionService:
                 self.workspace_dir, f"transcript_{video_id}.txt"
             )
 
-
             try:
                 cmd = [
                     "yt-dlp",

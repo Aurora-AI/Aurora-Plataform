@@ -1,5 +1,4 @@
 import redis
-
 from aurora_platform.core.config import settings
 
 redis_client = redis.Redis(

@@ -1,10 +1,10 @@
-
 from fastapi import APIRouter, BackgroundTasks, Depends
 
 from aurora_platform.dependencies import get_kb_service
 from aurora_platform.services.knowledge_service import KnowledgeBaseService
 
 router = APIRouter()
+
 
 @router.get("/health", tags=["Health"])
 async def health_check(

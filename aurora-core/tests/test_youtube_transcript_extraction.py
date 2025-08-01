@@ -1,7 +1,6 @@
 import os
 
 import pytest
-
 from aurora_platform.services.youtube_transcript_extraction_service import (
     YoutubeTranscriptExtractionService,
 )
