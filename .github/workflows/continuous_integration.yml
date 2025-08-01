@@ -1,5 +1,9 @@
 name: Continuous Integration
 
+# CI/CD Pipeline with Resilient Caching Implementation
+# This workflow implements dependency and model caching for improved performance
+# as per technical plan AUR-PLATFORM-CI-002
+
 on:
   pull_request:
     branches:
@@ -20,6 +24,27 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-core-${{ hashFiles('aurora-core/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-core-
+      
+      # Cache Hugging Face models
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: ${{ runner.os }}-huggingface-core-${{ hashFiles('aurora-core/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-huggingface-core-
+      
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
@@ -44,6 +69,27 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-crawler-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-crawler-
+      
+      # Cache Hugging Face models
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: ${{ runner.os }}-huggingface-crawler-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-huggingface-crawler-
+      
       - name: Install Poetry
         run: pip install poetry
       - name: Install dependencies
