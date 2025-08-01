@@ -1,0 +1,139 @@
+name: Platform CI - Aurora Core & Crawler
+
+# Trigger the workflow on pull requests and pushes to main branches
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-core:
+    name: Test aurora-core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-core
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Cache Poetry dependencies for faster builds and network resilience
+      # This caches both Poetry's virtual environment and pip's cache directory
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          # Cache key based on OS, Python version, and poetry.lock hash
+          # This ensures cache invalidation when dependencies change
+          key: poetry-${{ runner.os }}-py3.11-${{ hashFiles('aurora-core/poetry.lock') }}
+          # Fallback to previous caches for the same OS and Python version
+          restore-keys: |
+            poetry-${{ runner.os }}-py3.11-
+
+      # Cache Hugging Face models directory (if aurora-core uses HF models)
+      # This prevents re-downloading models on every build
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          # Cache key based on pyproject.toml to detect model dependency changes
+          key: huggingface-${{ runner.os }}-${{ hashFiles('aurora-core/pyproject.toml') }}
+          restore-keys: |
+            huggingface-${{ runner.os }}-
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      # Configure Poetry to use system Python and not create virtual environment
+      # This works better with GitHub Actions caching strategy
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create false
+          poetry config cache-dir ~/.cache/pypoetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check formatting
+        run: poetry run black --check .
+
+      - name: Lint
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest
+
+  test-crawler:
+    name: Test aurora-crawler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-crawler
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Cache Poetry dependencies for faster builds and network resilience
+      # This caches both Poetry's virtual environment and pip's cache directory
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          # Cache key based on OS, Python version, and poetry.lock hash
+          # This ensures cache invalidation when dependencies change
+          key: poetry-${{ runner.os }}-py3.11-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          # Fallback to previous caches for the same OS and Python version
+          restore-keys: |
+            poetry-${{ runner.os }}-py3.11-
+
+      # Cache Hugging Face models directory for transformers and sentence-transformers
+      # This prevents re-downloading models on every build, crucial for crawler service
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          # Cache key based on pyproject.toml to detect model dependency changes
+          key: huggingface-${{ runner.os }}-${{ hashFiles('aurora-crawler/pyproject.toml') }}
+          restore-keys: |
+            huggingface-${{ runner.os }}-
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      # Configure Poetry to use system Python and not create virtual environment
+      # This works better with GitHub Actions caching strategy
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create false
+          poetry config cache-dir ~/.cache/pypoetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Check formatting
+        run: poetry run black --check .
+
+      - name: Lint
+        run: poetry run ruff check .
+
+      - name: Run tests
+        run: poetry run pytest
