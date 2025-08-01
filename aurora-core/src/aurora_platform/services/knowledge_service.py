@@ -10,7 +10,7 @@ from chromadb.config import Settings
 logger = logging.getLogger(__name__)
 
 
-class KnowledgeBaseService:
+class KnowledgeService:
     def __init__(self, host: str = "chromadb", port: int = 8000):
         self.host = host
         self.port = port

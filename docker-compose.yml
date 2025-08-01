@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  aurora-core:
+    build: .
+    container_name: aurora-core
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./src
+          target: /app/src
+          ignore:
+            - "**/__pycache__"
+        - action: rebuild
+          path: pyproject.toml
+        - action: rebuild
+          path: poetry.lock
+volumes:
+  redis_data:

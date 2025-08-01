@@ -2,14 +2,14 @@
 from fastapi import APIRouter, BackgroundTasks, Depends
 
 from aurora_platform.dependencies import get_kb_service
-from aurora_platform.services.knowledge_service import KnowledgeBaseService
+from aurora_platform.services.knowledge_service import KnowledgeService
 
 router = APIRouter()
 
 @router.get("/health", tags=["Health"])
 async def health_check(
     background_tasks: BackgroundTasks,
-    kb_service: KnowledgeBaseService = Depends(get_kb_service),
+    kb_service: KnowledgeService = Depends(get_kb_service),
 ):
     """
     Retorna um status imediato e dispara uma verificação de saúde

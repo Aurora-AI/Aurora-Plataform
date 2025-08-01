@@ -5,13 +5,13 @@ from fastapi import APIRouter, Depends, HTTPException, Request, status
 from src.aurora_platform.core.security import get_current_user
 from src.aurora_platform.schemas.etp_schemas import ETPRequest, ETPResponse, ETPStatus
 from src.aurora_platform.services.etp_generator_service import ETPGeneratorService
-from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+from src.aurora_platform.services.knowledge_service import KnowledgeService
 
 router = APIRouter()
 
 
-def get_kb_service(request: Request) -> KnowledgeBaseService:
-    """Obtém a instância compartilhada do KnowledgeBaseService do estado da aplicação."""
+def get_kb_service(request: Request) -> KnowledgeService:
+    """Obtém a instância compartilhada do KnowledgeService do estado da aplicação."""
     return request.app.state.kb_service
 
 
@@ -19,7 +19,7 @@ def get_kb_service(request: Request) -> KnowledgeBaseService:
 async def generate_etp(
     request: ETPRequest,
     current_user=Depends(get_current_user),
-    kb_service: KnowledgeBaseService = Depends(get_kb_service),
+    kb_service: KnowledgeService = Depends(get_kb_service),
 ):
     """
     Gera um ETP baseado nos dados fornecidos usando pipeline RAG.

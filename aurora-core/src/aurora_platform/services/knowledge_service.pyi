@@ -3,7 +3,7 @@ from typing import List
 from chromadb.api import ClientAPI
 from chromadb.api.models.Collection import Collection
 
-class KnowledgeBaseService:
+class KnowledgeService:
     client: ClientAPI
     host: str
     port: int

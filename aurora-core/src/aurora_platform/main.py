@@ -11,7 +11,7 @@ from aurora_platform.api.v1.endpoints import auth_router, knowledge_router
 
 # Importa as configurações do local correto no Core
 from aurora_platform.core.config import settings
-from aurora_platform.services.knowledge_service import KnowledgeBaseService
+from aurora_platform.services.knowledge_service import KnowledgeService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     # Lógica de startup e shutdown
     logger.info("Iniciando Aurora-Core AIOS...")
-    app.state.kb_service = KnowledgeBaseService()
+    app.state.kb_service = KnowledgeService()
     yield
     logger.info("Encerrando Aurora-Core AIOS...")
 

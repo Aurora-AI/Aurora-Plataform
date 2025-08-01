@@ -1,6 +1,6 @@
 # retrieve_knowledge.py
 
-from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+from src.aurora_platform.services.knowledge_service import KnowledgeService
 
 OUTPUT_FILE = "retrieved_knowledge.md"
 
@@ -10,7 +10,7 @@ def extract_all_knowledge():
     Conecta-se à base de conhecimento e extrai todos os documentos armazenados.
     """
     print("INFO: Inicializando o serviço de base de conhecimento...")
-    kb_service = KnowledgeBaseService()
+    kb_service = KnowledgeService()
 
     # Busca todos os documentos usando o método retrieve
     all_docs = kb_service.retrieve(query="", top_k=1000)  # Busca ampla

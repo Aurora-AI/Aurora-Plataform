@@ -4,14 +4,14 @@ import uuid
 from datetime import datetime
 
 from src.aurora_platform.schemas.etp_schemas import ETPRequest, ETPResponse
-from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+from src.aurora_platform.services.knowledge_service import KnowledgeService
 from src.aurora_platform.services.llm_adapters import VertexAIAdapter
 
 
 class ETPGeneratorService:
     """Serviço para geração de ETPs usando pipeline RAG"""
 
-    def __init__(self, kb_service: KnowledgeBaseService):
+    def __init__(self, kb_service: KnowledgeService):
         self.kb_service = kb_service
         self.llm_adapter = VertexAIAdapter()
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, status
 
-from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+from src.aurora_platform.services.knowledge_service import KnowledgeService
 
 from .rule_based_router import RuleBasedRouter
 from .schemas import HubRequest, HubResponse
@@ -8,7 +8,7 @@ from .schemas import HubRequest, HubResponse
 router = APIRouter()
 
 # Instancia o serviço de conhecimento e o roteador
-kb_service = KnowledgeBaseService()
+kb_service = KnowledgeService()
 hub_router = RuleBasedRouter(kb_service=kb_service)
 
 @router.post("/dispatch", response_model=HubResponse)

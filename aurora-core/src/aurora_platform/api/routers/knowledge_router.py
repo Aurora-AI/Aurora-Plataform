@@ -8,21 +8,21 @@ import fitz  # PyMuPDF
 from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 
 from src.aurora_platform.schemas.knowledge_schemas import KnowledgeQuery, SearchResult
-from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+from src.aurora_platform.services.knowledge_service import KnowledgeService
 
 # Cria a instância do roteador para este módulo
 router = APIRouter()
 
 
-def get_kb_service(request: Request) -> KnowledgeBaseService:
-    """Obtém a instância compartilhada do KnowledgeBaseService do estado da aplicação."""
+def get_kb_service(request: Request) -> KnowledgeService:
+    """Obtém a instância compartilhada do KnowledgeService do estado da aplicação."""
     return request.app.state.kb_service
 
 
 @router.post("/knowledge/ingest-from-file", status_code=status.HTTP_201_CREATED)
 async def ingest_from_file(
     file: UploadFile = File(...),
-    kb_service: KnowledgeBaseService = Depends(get_kb_service),
+    kb_service: KnowledgeService = Depends(get_kb_service),
 ):
     """
     Faz upload de um arquivo PDF, extrai seu texto e ingere na base de conhecimento.
@@ -79,7 +79,7 @@ async def ingest_from_file(
 # --- Outros endpoints do roteador (se existirem) ---
 @router.post("/knowledge/search", response_model=SearchResult)
 async def search_in_kb(
-    query: KnowledgeQuery, kb_service: KnowledgeBaseService = Depends(get_kb_service)
+    query: KnowledgeQuery, kb_service: KnowledgeService = Depends(get_kb_service)
 ):
     """Realiza uma busca semântica na base de conhecimento."""
     results = kb_service.retrieve(query=query.query, top_k=query.n_results)

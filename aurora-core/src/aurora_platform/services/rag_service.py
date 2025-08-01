@@ -1,7 +1,7 @@
 # src/aurora_platform/services/rag_service.py
 
 from .adapter_factory import AdapterFactory
-from .knowledge_service import KnowledgeBaseService
+from .knowledge_service import KnowledgeService
 
 # --- MUDANÇA CRÍTICA: Importa a interface e a fábrica ---
 from .llm_adapters import ILLMAdapter
@@ -20,7 +20,7 @@ def answer_query(query: str, model_provider: str) -> str:
         return str(e)
 
     # 2. Recuperar o contexto
-    kb_service = KnowledgeBaseService()
+    kb_service = KnowledgeService()
     retrieved_docs = kb_service.retrieve(query, top_k=2)
 
     if not retrieved_docs:

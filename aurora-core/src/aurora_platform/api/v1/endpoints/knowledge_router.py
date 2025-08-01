@@ -6,20 +6,20 @@ from aurora_platform.schemas.knowledge_schemas import (
     KnowledgeQueryWithProvider,
     SearchResult,
 )
-from aurora_platform.services.knowledge_service import KnowledgeBaseService
+from aurora_platform.services.knowledge_service import KnowledgeService
 from aurora_platform.services.rag_service import answer_query
 
 router = APIRouter(prefix="/knowledge", tags=["Knowledge"])
 
 
-def get_kb_service(request: Request) -> KnowledgeBaseService:
+def get_kb_service(request: Request) -> KnowledgeService:
     return request.app.state.kb_service
 
     # TODO: Reativar/substituir na integração do Crawler
     # @router.post("/ingest-from-web", status_code=status.HTTP_202_ACCEPTED)
     # async def ingest_from_web(
     #     request_body: IngestURLRequest,
-    #     kb_service: KnowledgeBaseService = Depends(get_kb_service),
+    #     kb_service: KnowledgeService = Depends(get_kb_service),
     # ):
     #     try:
     #         scraper = DeepDiveScraperService()
@@ -43,7 +43,7 @@ def get_kb_service(request: Request) -> KnowledgeBaseService:
     # @router.post("/ingest-from-web", status_code=status.HTTP_202_ACCEPTED)
     # async def ingest_from_web(
     #     request_body: IngestURLRequest,
-    #     kb_service: KnowledgeBaseService = Depends(get_kb_service),
+    #     kb_service: KnowledgeService = Depends(get_kb_service),
     # ):
     #     try:
     #         scraper = DeepDiveScraperService()
@@ -67,7 +67,7 @@ def get_kb_service(request: Request) -> KnowledgeBaseService:
 
 @router.post("/search", response_model=SearchResult)
 async def search_in_kb(
-    query: KnowledgeQuery, kb_service: KnowledgeBaseService = Depends(get_kb_service)
+    query: KnowledgeQuery, kb_service: KnowledgeService = Depends(get_kb_service)
 ):
     results = kb_service.retrieve(query=query.query, top_k=query.n_results)
     document_texts = [doc.get("text", "") for doc in results if doc.get("text")]

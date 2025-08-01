@@ -15,9 +15,9 @@ router = APIRouter(prefix="/etp", tags=["ETP Generator"])
 async def generate_etp(request: ETPRequest):
     """Gera Estudo Técnico Preliminar baseado em RAG."""
     try:
-        from src.aurora_platform.services.knowledge_service import KnowledgeBaseService
+        from src.aurora_platform.services.knowledge_service import KnowledgeService
 
-        kb_service = KnowledgeBaseService()
+        kb_service = KnowledgeService()
         generator = ETPGeneratorService(kb_service)
         etp_response = await generator.generate_etp(request)
         return etp_response.conteudo_markdown
