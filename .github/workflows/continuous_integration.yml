@@ -1,100 +1,38 @@
 name: Continuous Integration
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ main ]
 
 jobs:
-  test-core:
-    name: Test aurora-core
+  build_and_test:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./aurora-core
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
-      - name: Install Poetry
-        run: pip install poetry
-      - name: Check pyproject.toml presence
-        run: |
-          if [ ! -f pyproject.toml ]; then
-            echo "pyproject.toml not found!"
-            exit 1
-          fi
-      - name: Install dependencies
-        run: poetry install --no-interaction
-      - name: Cache Hugging Face models
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface/hub
-          key: ${{ runner.os }}-hf-models-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-hf-models-
-      - name: Check formatting
-        run: poetry run black --check .
-      - name: Lint
-        run: poetry run ruff check .
-      - name: Run tests
-        run: poetry run pytest
+        working-directory: ./aurora-core # Define o diretório padrão para todos os comandos
 
-  test-crawler:
-    name: Test aurora-crawler
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./aurora-crawler
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: Cache Poetry dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
+
       - name: Install Poetry
         run: pip install poetry
-      - name: Check pyproject.toml presence
-        run: |
-          if [ ! -f pyproject.toml ]; then
-            echo "pyproject.toml not found!"
-            exit 1
-          fi
+
       - name: Install dependencies
-        run: poetry install --no-interaction
-      - name: Cache Hugging Face models
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface/hub
-          key: ${{ runner.os }}-hf-models-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-hf-models-
-      - name: Check formatting
-        run: poetry run black --check .
-      - name: Lint
-        run: poetry run ruff check .
-      - name: Run tests
+        run: poetry install
+
+      - name: Format with Black and Ruff
+        run: |
+          poetry run black .
+          poetry run ruff check . --fix
+          poetry run ruff format .
+
+      - name: Run tests with pytest
         run: poetry run pytest
