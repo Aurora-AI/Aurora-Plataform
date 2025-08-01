@@ -1,0 +1,98 @@
+# CI/CD Pipeline Optimization - AUR-PLATFORM-CI-003
+# Estratégia de Cache: Poetry dependencies (baseado em poetry.lock) e modelos Hugging Face
+# para aumentar resiliência e velocidade do pipeline conforme Plano Técnico aprovado
+name: Platform CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  test-core:
+    name: Test aurora-core
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-core
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+            ./aurora-core/.venv
+          key: poetry-aurora-core-${{ runner.os }}-python3.11-${{ hashFiles('aurora-core/poetry.lock') }}
+          restore-keys: |
+            poetry-aurora-core-${{ runner.os }}-python3.11-
+
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Configure Poetry
+        run: poetry config virtualenvs.in-project true
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Check formatting
+        run: poetry run black --check .
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Run tests
+        run: poetry run pytest
+
+  test-crawler:
+    name: Test aurora-crawler
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./aurora-crawler
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      # Cache Poetry dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+            ./aurora-crawler/.venv
+          key: poetry-aurora-crawler-${{ runner.os }}-python3.11-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            poetry-aurora-crawler-${{ runner.os }}-python3.11-
+
+      # Cache Hugging Face models
+      - name: Cache Hugging Face models
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: huggingface-models-${{ runner.os }}-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            huggingface-models-${{ runner.os }}-
+
+      - name: Install Poetry
+        run: pip install poetry
+      - name: Configure Poetry
+        run: poetry config virtualenvs.in-project true
+      - name: Install dependencies
+        run: poetry install --no-interaction
+      - name: Check formatting
+        run: poetry run black --check .
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Run tests
+        run: poetry run pytest
