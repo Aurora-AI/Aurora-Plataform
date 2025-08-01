@@ -25,5 +25,6 @@ class AdapterFactory:
             return DeepSeekAdapter()
         else:
             raise ValueError(
-                f"Provedor de LLM desconhecido: '{provider_name}'. Os provedores suportados são: google, azure, deepseek."
+                f"Provedor de LLM desconhecido: '{provider_name}'. "
+                "Os provedores suportados são: google, azure, deepseek."
             )

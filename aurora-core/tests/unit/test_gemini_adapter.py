@@ -1,6 +1,7 @@
 import pytest
-from aurora_platform.services.llm_adapters import GeminiAdapter
 from pydantic import SecretStr as V2SecretStr
+
+from aurora_platform.services.llm_adapters import GeminiAdapter
 
 
 def test_gemini_adapter_key_types():
