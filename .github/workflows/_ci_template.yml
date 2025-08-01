@@ -1,3 +1,4 @@
+# Template CI com Cache Otimizado - Conforme Plano Técnico AUR-PLATFORM-CI-003
 name: CI Template
 
 on:
@@ -10,6 +11,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./${{ inputs.service_name }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -17,16 +21,42 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      # Cache Poetry dependencies baseado em poetry.lock hash
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+            ./${{ inputs.service_name }}/.venv
+          key: poetry-${{ inputs.service_name }}-${{ runner.os }}-py3.11-${{ hashFiles(format('{0}/poetry.lock', inputs.service_name)) }}
+          restore-keys: |
+            poetry-${{ inputs.service_name }}-${{ runner.os }}-py3.11-
+
+      # Cache Hugging Face models para aurora-crawler (quando aplicável)
+      - name: Cache Hugging Face models
+        if: inputs.service_name == 'aurora-crawler'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/huggingface
+            ~/.cache/torch
+          key: huggingface-models-${{ runner.os }}-${{ hashFiles('aurora-crawler/poetry.lock') }}
+          restore-keys: |
+            huggingface-models-${{ runner.os }}-
+
       - name: Install dependencies
         run: |
           pip install poetry
+          poetry config virtualenvs.in-project true
           poetry install --no-interaction
       - name: Run tests
         run: |
-          pytest || true
+          poetry run pytest || true
       - name: Lint
         run: |
-          ruff check . || true
+          poetry run ruff check . || true
       - name: Report status
         if: failure()
         run: echo "Build or tests failed for ${{ inputs.service_name }}"

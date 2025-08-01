@@ -1,5 +1,5 @@
 # Aurora Platform CI/CD Pipeline com Otimização e Resiliência
-# 
+#
 # Estratégia de Cache implementada conforme Plano Técnico AUR-PLATFORM-CI-003:
 # - Cache de dependências Poetry baseado em hash de poetry.lock
 # - Cache de modelos Hugging Face para otimizar downloads de ML models
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       # Cache Poetry dependencies baseado em poetry.lock hash
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
@@ -40,7 +40,7 @@ jobs:
           key: poetry-core-${{ runner.os }}-py3.11-${{ hashFiles('aurora-core/poetry.lock') }}
           restore-keys: |
             poetry-core-${{ runner.os }}-py3.11-
-      
+
       - name: Install Poetry
         run: pip install poetry
       - name: Configure Poetry
@@ -67,7 +67,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       # Cache Poetry dependencies baseado em poetry.lock hash
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
@@ -79,7 +79,7 @@ jobs:
           key: poetry-crawler-${{ runner.os }}-py3.11-${{ hashFiles('aurora-crawler/poetry.lock') }}
           restore-keys: |
             poetry-crawler-${{ runner.os }}-py3.11-
-      
+
       # Cache Hugging Face models para otimizar downloads de ML models
       - name: Cache Hugging Face models
         uses: actions/cache@v4
@@ -90,7 +90,7 @@ jobs:
           key: huggingface-models-${{ runner.os }}-${{ hashFiles('aurora-crawler/poetry.lock') }}
           restore-keys: |
             huggingface-models-${{ runner.os }}-
-      
+
       - name: Install Poetry
         run: pip install poetry
       - name: Configure Poetry
