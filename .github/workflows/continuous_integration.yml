@@ -16,10 +16,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
@@ -29,16 +31,20 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
+
       - name: Install Poetry
         run: pip install poetry
+
       - name: Check pyproject.toml presence
         run: |
           if [ ! -f pyproject.toml ]; then
             echo "pyproject.toml not found!"
             exit 1
           fi
+
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with dev
+
       - name: Cache Hugging Face models
         uses: actions/cache@v4
         with:
@@ -46,10 +52,13 @@ jobs:
           key: ${{ runner.os }}-hf-models-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-hf-models-
+
       - name: Check formatting
         run: poetry run black --check .
+
       - name: Lint
         run: poetry run ruff check .
+
       - name: Run tests
         run: poetry run pytest
 
@@ -62,10 +71,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
       - name: Cache Poetry dependencies
         uses: actions/cache@v4
         with:
@@ -75,16 +86,20 @@ jobs:
           key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             ${{ runner.os }}-poetry-
+
       - name: Install Poetry
         run: pip install poetry
+
       - name: Check pyproject.toml presence
         run: |
           if [ ! -f pyproject.toml ]; then
             echo "pyproject.toml not found!"
             exit 1
           fi
+
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: poetry install --no-interaction --with dev
+
       - name: Cache Hugging Face models
         uses: actions/cache@v4
         with:
@@ -92,9 +107,12 @@ jobs:
           key: ${{ runner.os }}-hf-models-${{ hashFiles('requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-hf-models-
+
       - name: Check formatting
         run: poetry run black --check .
+
       - name: Lint
         run: poetry run ruff check .
+
       - name: Run tests
         run: poetry run pytest
