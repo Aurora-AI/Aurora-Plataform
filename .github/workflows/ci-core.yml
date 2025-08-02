@@ -1,0 +1,43 @@
+name: CI Aurora-Core
+
+on:
+  push:
+    paths:
+      - 'aurora-core/**'
+      - '.github/workflows/ci-core.yml'
+  pull_request:
+    paths:
+      - 'aurora-core/**'
+      - '.github/workflows/ci-core.yml'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: aurora-core
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Run linter (black)
+        run: poetry run black --check src/
+
+      - name: Run linter (ruff)
+        run: poetry run ruff check src/
+
+      - name: Run tests
+        run: poetry run pytest
