@@ -1,22 +1,17 @@
-name: CI Aurora-Core
+name: Continuous Integration
 
 on:
   push:
-    paths:
-      - 'aurora-core/**'
-      - '.github/workflows/ci-core.yml'
+    branches: [ main ]
   pull_request:
-    paths:
-      - 'aurora-core/**'
-      - '.github/workflows/ci-core.yml'
+    branches: [ main ]
 
 jobs:
-  build-and-test:
+  build_and_test:
     runs-on: ubuntu-latest
-
     defaults:
       run:
-        working-directory: aurora-core
+        working-directory: ./aurora-core
 
     steps:
       - name: Checkout repository
@@ -33,11 +28,10 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev
 
-      - name: Run linter (black)
-        run: poetry run black --check src/
-
-      - name: Run linter (ruff)
-        run: poetry run ruff check src/
-
-      - name: Run tests
+      - name: Format with Black and Ruff
+        run: |
+          poetry run black .
+          poetry run ruff check . --fix
+          poetry run ruff format .
+      - name: Run tests with pytest
         run: poetry run pytest
