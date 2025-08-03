@@ -43,7 +43,7 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: poetry install --no-interaction --with dev
+        run: poetry install --no-interaction
 
       - name: Cache Hugging Face models
         uses: actions/cache@v4
@@ -98,7 +98,7 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: poetry install --no-interaction --with dev
+        run: poetry install --no-interaction
 
       - name: Cache Hugging Face models
         uses: actions/cache@v4
