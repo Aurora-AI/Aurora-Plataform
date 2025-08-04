@@ -1,0 +1,41 @@
+name: CI Aurora-Plataforma
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test Aurora Platform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        # O working-directory garante que o poetry encontre o pyproject.toml
+        run: poetry install --no-interaction
+        working-directory: ./
+
+      - name: Format, Lint, and Check Code
+        run: |
+          poetry run black .
+          poetry run ruff format .
+          poetry run ruff check .
+        working-directory: ./
+
+      - name: Run tests with pytest
+        # Executa os testes usando o Docker Compose para um ambiente limpo
+        run: docker compose exec -T aurora-core pytest
+        working-directory: ./
