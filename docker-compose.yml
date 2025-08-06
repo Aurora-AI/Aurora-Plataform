@@ -1,0 +1,129 @@
+# Aurora Platform - Multi-Service Architecture
+# Consolidated docker-compose for complete Aurora ecosystem
+
+services:
+  # Redis - Cache and Session Store
+  redis:
+    image: redis:7-alpine
+    container_name: aurora-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+  # ChromaDB - Vector Database for AI/ML
+  chromadb:
+    image: chromadb/chroma:0.4.15
+    container_name: aurora-chromadb
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=False
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    # Compatibility fix for NumPy <2.0
+    command: sh -c "pip install --force-reinstall 'numpy<2.0' && uvicorn chromadb.app:app --host 0.0.0.0 --port 8000"
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+  # Aurora Core - Main Application
+  aurora-core:
+    build: 
+      context: ./aurora-core
+      dockerfile: Dockerfile
+    container_name: aurora-core
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    environment:
+      - REDIS_HOST=aurora-redis
+      - REDIS_PORT=6379
+      - CHROMA_HOST=aurora-chromadb
+      - CHROMA_PORT=8000
+      - DATABASE_URL=postgresql://aurora_user:aurora_pass@aurora-postgres:5432/aurora_db
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - aurora-network
+    volumes:
+      - ./aurora-core/data:/app/data
+      - ./aurora-core/logs:/app/logs
+
+  # PostgreSQL - Primary Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: aurora-postgres
+    environment:
+      POSTGRES_DB: aurora_db
+      POSTGRES_USER: aurora_user
+      POSTGRES_PASSWORD: aurora_pass
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./aurora-core/scripts/db-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aurora_user -d aurora_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+  # Nginx - Reverse Proxy and Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: aurora-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+      - nginx_logs:/var/log/nginx
+    depends_on:
+      - aurora-core
+    restart: unless-stopped
+    networks:
+      - aurora-network
+
+volumes:
+  redis_data:
+    driver: local
+  chroma_data:
+    driver: local
+  postgres_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+networks:
+  aurora-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
