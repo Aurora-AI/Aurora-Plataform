@@ -51,9 +51,10 @@ Devido a histórico divergente entre branches e impossibilidade de merge convenc
 ✅ **Fase 1**: Diagnóstico e validação do estado atual  
 ✅ **Fase 2**: Limpeza e preparação do ambiente  
 ✅ **Fase 3**: Teste e validação da aplicação  
-🔄 **Fase 4**: Commit convencional e force push para main  
-⏳ **Fase 5**: Validação CI/CD pós-rollout  
-⏳ **Fase 6**: Atualização de documentação final  
+✅ **Fase 4**: Commit convencional e preparação para rollout  
+⚠️ **Fase 5**: Force push para main (requer intervenção manual)  
+⏳ **Fase 6**: Validação CI/CD pós-rollout  
+⏳ **Fase 7**: Atualização de documentação final  
 
 ### Estrutura Validada
 
@@ -70,7 +71,12 @@ Aurora-Plataform/
 ```
 
 **Próximos Passos:**
-- Execução da operação de force push
-- Validação de automações CI/CD
+- ⚠️ **AÇÃO MANUAL REQUERIDA**: Execução da operação de force push para main
+- Comando sugerido: `git push --force-with-lease origin HEAD:main`
+- Validação de automações CI/CD pós-operação
 - Confirmação de integridade do projeto
 - Notificação à equipe técnica
+
+### Nota Técnica
+
+Esta operação requer privilégios administrativos para reescrever o histórico do branch main. O estado atual do repositório foi preparado e validado, restando apenas a execução do comando de force push por um administrador autorizado.
